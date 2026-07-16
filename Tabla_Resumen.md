@@ -1,4 +1,5 @@
-# Arquitectura y Estructura del Proyecto: Elite Scout
+# Creado el 07/07/2026
+# Arquitectura y Estructura del Proyecto: Elite Scout Ver 0.1
 
 Este documento describe la estructura técnica y los archivos del ecosistema Elite Scout, diseñado para la gestión y exportación de datos deportivos.
 
@@ -21,3 +22,13 @@ Este documento describe la estructura técnica y los archivos del ecosistema Eli
 * **Gestor de Estado (`state`)**: Objeto global ligero que rastrea los filtros activos (equipo seleccionado, término de búsqueda y posición).
 * **Motor de Renderizado**: Conjunto de funciones (`renderRoster`, `renderStandings`, etc.) que actualizan partes específicas del DOM utilizando *Template Literals*.
 * **Módulo de I/O (Exportación)**: Sistema basado en la API nativa `Blob` que serializa los objetos de memoria en archivos TXT, CSV y MD para su descarga directa en el navegador.
+
+# Actualizacion 0.2 15/07/2026
+
+# Mejora estetica
+
+**Se agregó una etiqueta <style> con CSS puro exclusivamente para**
+
+ - Personalizar la barra de desplazamiento (scrollbar).
+ - Crear animaciones de entrada fluidas (cardPop, modalPop, fadeIn).
+ - Implementar un sistema de variables CSS (:root) que permite el cambio dinámico entre modo claro/oscuro y múltiples temas de colores sin recargar la página para una labor mas estetica.
