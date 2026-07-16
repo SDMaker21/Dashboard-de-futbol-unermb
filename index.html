@@ -1,613 +1,728 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Elite Scout — Dashboard Deportivo Premium</title>
-<script src="https://cdn.tailwindcss.com"></script>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<style>
-  body { font-family: 'Inter', sans-serif; }
-  .font-display { font-family: 'Rajdhani', sans-serif; }
-  ::-webkit-scrollbar { width: 8px; height: 8px; }
-  ::-webkit-scrollbar-track { background: #0f172a; }
-  ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
-  ::-webkit-scrollbar-thumb:hover { background: #10b981; }
-  .card-enter { animation: cardFade .35s ease both; }
-  @keyframes cardFade { from { opacity:0; transform: translateY(8px);} to {opacity:1; transform: translateY(0);} }
-  .modal-enter { animation: modalPop .25s cubic-bezier(.16,1,.3,1) both; }
-  @keyframes modalPop { from { opacity:0; transform: scale(.94);} to {opacity:1; transform: scale(1);} }
-</style>
-</head>
-<body class="bg-slate-900 text-slate-100 min-h-screen selection:bg-emerald-500/30">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Elite Scout — Dashboard Deportivo Premium</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* =========================================================================
+       ESTILOS BASE ORIGINALES
+       ========================================================================= */
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', system-ui, -apple-system, sans-serif; }
+    
+    /* Scrollbar personalizado */
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: #1e293b; }
+    ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #10b981; }
 
-  <!-- ============ HEADER / NAV ============ -->
-  <header class="sticky top-0 z-30 bg-slate-900/90 backdrop-blur border-b border-slate-800">
-    <div class="max-w-7xl mx-auto px-6 py-4 flex flex-wrap items-center justify-between gap-4">
+    /* Animaciones originales */
+    @keyframes cardPop { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes modalPop { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+    .card-enter { animation: cardPop 0.4s ease-out forwards; }
+    .modal-enter { animation: modalPop 0.25s ease-out forwards; }
+    .fade-in { animation: fadeIn 0.3s ease-out forwards; }
+
+    .hover-lift { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+    .hover-lift:hover { transform: translateY(-4px); }
+
+    .stat-bar { transition: width 1s ease-out; }
+
+    /* =========================================================================
+       SISTEMA DE PERSONALIZACIÓN: VARIABLES CSS
+       ========================================================================= */
+    :root {
+      --accent: #10b981;
+      --accent-alt: #06b6d4;
+      --bg-main: #0f172a;
+      --bg-card: #1e293b;
+      --text-main: #f1f5f9;
+      --text-muted: #94a3b8;
+      --border: #334155;
+    }
+
+    /* Modo Claro */
+    body[data-mode="light"] {
+      --bg-main: #f8fafc;
+      --bg-card: #ffffff;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+    }
+
+    /* Temas de Color (Acentos) */
+    body[data-theme="azul"] { --accent: #3b82f6; --accent-alt: #60a5fa; }
+    body[data-theme="rojo"] { --accent: #ef4444; --accent-alt: #f87171; }
+    body[data-theme="morado"] { --accent: #a855f7; --accent-alt: #c084fc; }
+    body[data-theme="rosa"] { --accent: #ec4899; --accent-alt: #f472b6; }
+    body[data-theme="naranja"] { --accent: #f97316; --accent-alt: #fb923c; }
+    body[data-theme="amarillo"] { --accent: #eab308; --accent-alt: #facc15; }
+
+    /* Aplicar variables a elementos existentes */
+    body { 
+      background-color: var(--bg-main); 
+      color: var(--text-main); 
+      transition: background-color 0.3s, color 0.3s; 
+    }
+
+    /* Overrides para modo oscuro/claro usando variables */
+    .bg-slate-900 { background-color: var(--bg-main) !important; }
+    .bg-slate-800 { background-color: var(--bg-card) !important; }
+    .bg-slate-800\/70 { background-color: color-mix(in srgb, var(--bg-card) 70%, transparent) !important; }
+    .bg-slate-800\/90 { background-color: color-mix(in srgb, var(--bg-main) 90%, transparent) !important; }
+    .bg-slate-700 { background-color: var(--border) !important; }
+    .bg-slate-900\/60 { background-color: color-mix(in srgb, var(--bg-main) 60%, transparent) !important; }
+    
+    .text-slate-100 { color: var(--text-main) !important; }
+    .text-slate-300 { color: var(--text-main) !important; }
+    .text-slate-400 { color: var(--text-muted) !important; }
+    .text-slate-500 { color: var(--text-muted) !important; }
+    .text-slate-600 { color: color-mix(in srgb, var(--text-main) 60%, transparent) !important; }
+
+    .text-emerald-400 { color: var(--accent) !important; }
+    .text-cyan-400 { color: var(--accent-alt) !important; }
+    .bg-emerald-500 { background-color: var(--accent) !important; }
+    .bg-cyan-400 { background-color: var(--accent-alt) !important; }
+
+    .border-slate-800 { border-color: var(--border) !important; }
+    .border-slate-700 { border-color: var(--border) !important; }
+    .border-slate-700\/50 { border-color: color-mix(in srgb, var(--border) 50%, transparent) !important; }
+    .border-slate-700\/70 { border-color: color-mix(in srgb, var(--border) 70%, transparent) !important; }
+
+    .hover\:bg-slate-700\/60:hover { background-color: color-mix(in srgb, var(--border) 60%, transparent) !important; }
+    .hover\:bg-slate-700\/40:hover { background-color: color-mix(in srgb, var(--border) 40%, transparent) !important; }
+
+    .bg-emerald-500\/10 { background-color: color-mix(in srgb, var(--accent) 10%, transparent) !important; }
+    .shadow-emerald-500\/20 { --tw-shadow-color: color-mix(in srgb, var(--accent) 20%, transparent) !important; }
+    .hover\:border-emerald-500\/60:hover { border-color: color-mix(in srgb, var(--accent) 60%, transparent) !important; }
+    .hover\:shadow-emerald-500\/10:hover { --tw-shadow-color: color-mix(in srgb, var(--accent) 10%, transparent) !important; }
+    .selection\:bg-emerald-500\/30::selection { background-color: color-mix(in srgb, var(--accent) 30%, transparent) !important; }
+    .from-emerald-500\/10 { --tw-gradient-from: color-mix(in srgb, var(--accent) 10%, transparent) !important; }
+    .to-cyan-400\/5 { --tw-gradient-to: color-mix(in srgb, var(--accent-alt) 5%, transparent) !important; }
+    .border-emerald-500\/50 { border-color: color-mix(in srgb, var(--accent) 50%, transparent) !important; }
+    .focus\:ring-emerald-500\/60:focus { --tw-ring-color: color-mix(in srgb, var(--accent) 60%, transparent) !important; }
+    .focus\:border-emerald-500:focus { border-color: var(--accent) !important; }
+    .hover\:border-cyan-400\/60:hover { border-color: color-mix(in srgb, var(--accent-alt) 60%, transparent) !important; }
+    .hover\:text-cyan-400:hover { color: var(--accent-alt) !important; }
+    .border-cyan-400 { border-color: var(--accent-alt) !important; }
+
+    /* Ajustes específicos para modo claro */
+    body[data-mode="light"] ::-webkit-scrollbar-track { background: #e2e8f0; }
+    body[data-mode="light"] ::-webkit-scrollbar-thumb { background: #94a3b8; }
+    body[data-mode="light"] ::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+
+    /* Animación del menú de configuración */
+    .config-menu-enter { animation: configMenuSlide 0.25s ease-out forwards; }
+    @keyframes configMenuSlide { 
+      from { opacity: 0; transform: translateY(-10px); } 
+      to { opacity: 1; transform: translateY(0); } 
+    }
+  </style>
+</head>
+<body class="min-h-screen selection:bg-emerald-500/30">
+  
+  <!-- =========================================================================
+       HEADER
+       ========================================================================= -->
+  <header class="sticky top-0 z-30 bg-slate-900/90 backdrop-blur-md border-b border-slate-800">
+    <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
+      
+      <!-- Logo -->
       <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-emerald-500 to-cyan-400 flex items-center justify-center font-display font-bold text-slate-900 text-lg">ES</div>
+        <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-emerald-500 to-cyan-400 flex items-center justify-center text-white font-bold shadow-lg">ES</div>
         <div>
-          <h1 class="font-display font-bold text-xl tracking-wide leading-none">ELITE <span class="text-emerald-400">SCOUT</span></h1>
-          <p class="text-xs text-slate-400 tracking-widest uppercase">Sports Analytics Dashboard</p>
+          <h1 class="text-xl font-bold tracking-tight text-slate-100">ELITE SCOUT</h1>
+          <p class="text-xs text-slate-400">Sports Analytics Dashboard</p>
         </div>
       </div>
 
-      <!-- Selector de equipo activo -->
-      <nav id="team-tabs" class="flex items-center gap-2 bg-slate-800/70 p-1.5 rounded-xl border border-slate-700"></nav>
+      <!-- Pestañas de Equipos -->
+      <nav class="hidden md:flex gap-2 bg-slate-800 p-1 rounded-xl border border-slate-700">
+        <button data-team="Argentina" class="team-tab px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 bg-emerald-500 text-white">🇦🇷 Argentina</button>
+        <button data-team="Francia" class="team-tab px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 text-slate-400 hover:text-slate-100">🇫🇷 Francia</button>
+        <button data-team="Brasil" class="team-tab px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 text-slate-400 hover:text-slate-100">🇧🇷 Brasil</button>
+      </nav>
 
-      <!-- Panel de exportación -->
-      <div class="relative">
-        <button id="export-btn" class="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-800 border border-slate-700 hover:border-cyan-400/60 hover:bg-slate-700/60 transition-all duration-300 text-sm font-medium">
-          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5 5-5M12 15V3"/></svg>
-          Exportar datos
-        </button>
-        <div id="export-menu" class="hidden absolute right-0 mt-2 w-72 bg-slate-800 border border-slate-700 rounded-xl shadow-2xl shadow-black/40 overflow-hidden z-40">
-          <button data-format="txt" class="export-option w-full text-left px-4 py-3 hover:bg-slate-700/70 transition-all duration-300 flex flex-col gap-0.5 border-b border-slate-700/70">
-            <span class="text-sm font-semibold text-emerald-400">Fichas_Individuales.txt</span>
-            <span class="text-xs text-slate-400">Reporte visual ASCII para cuerpo técnico</span>
+      <!-- Acciones -->
+      <div class="flex items-center gap-3">
+        
+        <!-- Exportar -->
+        <div class="relative">
+          <button id="export-btn" class="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-800 border border-slate-700 hover:border-cyan-400/60 hover:bg-slate-700/60 transition-all duration-300 text-sm font-medium">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5 5-5M12 15V3"/>
+            </svg>
+            <span class="hidden sm:inline">Exportar datos</span>
           </button>
-          <button data-format="md" class="export-option w-full text-left px-4 py-3 hover:bg-slate-700/70 transition-all duration-300 flex flex-col gap-0.5 border-b border-slate-700/70">
-            <span class="text-sm font-semibold text-cyan-400">Tabla_Resumen.md</span>
-            <span class="text-xs text-slate-400">Documentación estructurada (GitHub / Notion)</span>
-          </button>
-          <button data-format="csv" class="export-option w-full text-left px-4 py-3 hover:bg-slate-700/70 transition-all duration-300 flex flex-col gap-0.5">
-            <span class="text-sm font-semibold text-slate-100">Base_Datos.csv</span>
-            <span class="text-xs text-slate-400">Formato tabular para Excel / Sheets</span>
-          </button>
+          <div id="export-menu" class="hidden absolute right-0 mt-2 w-72 bg-slate-800 border border-slate-700 rounded-xl shadow-2xl shadow-black/40 overflow-hidden z-40">
+            <button data-format="txt" class="export-option w-full text-left px-4 py-3 hover:bg-slate-700/70 transition-all duration-300 flex flex-col gap-0.5 border-b border-slate-700/70">
+              <span class="text-sm font-semibold text-emerald-400">Fichas_Individuales.txt</span>
+              <span class="text-xs text-slate-400">Reporte visual ASCII para cuerpo técnico</span>
+            </button>
+            <button data-format="md" class="export-option w-full text-left px-4 py-3 hover:bg-slate-700/70 transition-all duration-300 flex flex-col gap-0.5 border-b border-slate-700/70">
+              <span class="text-sm font-semibold text-cyan-400">Tabla_Resumen.md</span>
+              <span class="text-xs text-slate-400">Documentación estructurada (GitHub / Notion)</span>
+            </button>
+            <button data-format="csv" class="export-option w-full text-left px-4 py-3 hover:bg-slate-700/70 transition-all duration-300 flex flex-col gap-0.5">
+              <span class="text-sm font-semibold text-slate-100">Base_Datos.csv</span>
+              <span class="text-xs text-slate-400">Formato tabular para Excel / Sheets</span>
+            </button>
+          </div>
         </div>
+
+        <!-- NUEVO: Botón Hamburguesa (Configuración) -->
+        <button id="config-btn" class="p-2.5 rounded-xl bg-slate-800 border border-slate-700 hover:border-cyan-400/60 hover:bg-slate-700/60 transition-all duration-300">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>
+          </svg>
+        </button>
       </div>
     </div>
   </header>
 
-  <!-- ============ LAYOUT PRINCIPAL ============ -->
-  <main class="max-w-7xl mx-auto px-6 py-8 grid grid-cols-1 lg:grid-cols-4 gap-6">
+  <!-- =========================================================================
+       NUEVO: MENÚ FLOTANTE DE CONFIGURACIÓN
+       ========================================================================= -->
+  <div id="config-menu" class="hidden fixed top-20 right-6 w-64 rounded-2xl shadow-2xl p-5 z-50 config-menu-enter border" style="background-color: var(--bg-card); border-color: var(--border);">
+    
+    <h3 class="text-sm font-bold mb-4 text-center uppercase tracking-wider" style="color: var(--text-muted);">Apariencia</h3>
 
-    <!-- -------- SIDEBAR: TABLA DE POSICIONES -------- -->
-    <aside class="lg:col-span-1">
-      <div class="bg-slate-800 border border-slate-700 rounded-2xl p-5 sticky top-24">
-        <h2 class="font-display font-bold text-lg mb-1 tracking-wide">Tabla de Posiciones</h2>
-        <p class="text-xs text-slate-400 mb-4">Fase de grupos · Actualizado</p>
-        <table class="w-full text-sm">
-          <thead>
-            <tr class="text-slate-400 text-xs uppercase border-b border-slate-700">
-              <th class="text-left py-2 font-medium">Equipo</th>
-              <th class="text-center py-2 font-medium">PJ</th>
-              <th class="text-center py-2 font-medium">DG</th>
-              <th class="text-center py-2 font-medium">Pts</th>
-            </tr>
-          </thead>
-          <tbody id="standings-body"></tbody>
-        </table>
+    <!-- Control Claro/Oscuro (Diseño Simétrico) -->
+    <div class="grid grid-cols-2 gap-4 mb-4">
+      
+      <!-- Modo Claro -->
+      <button id="btn-light" class="flex flex-col items-center gap-2 p-3 rounded-xl transition hover:opacity-80" style="background-color: color-mix(in srgb, var(--border) 30%, transparent);">
+        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color: var(--text-main);">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
+        </svg>
+        <span class="text-xs font-medium" style="color: var(--text-main);">Claro</span>
+        <div id="indicator-light" class="w-4 h-4 rounded-full border-2 transition-all duration-300" style="border-color: var(--border);"></div>
+      </button>
 
-        <div class="mt-6 pt-5 border-t border-slate-700">
-          <h3 class="text-xs uppercase tracking-widest text-slate-400 mb-3">Forma reciente</h3>
-          <div id="form-legend" class="space-y-2"></div>
-        </div>
-      </div>
-    </aside>
+      <!-- Modo Oscuro -->
+      <button id="btn-dark" class="flex flex-col items-center gap-2 p-3 rounded-xl transition hover:opacity-80" style="background-color: color-mix(in srgb, var(--border) 30%, transparent);">
+        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color: var(--text-main);">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+        </svg>
+        <span class="text-xs font-medium" style="color: var(--text-main);">Oscuro</span>
+        <div id="indicator-dark" class="w-4 h-4 rounded-full border-2 transition-all duration-300" style="border-color: var(--border);"></div>
+      </button>
+    </div>
 
-    <!-- -------- CONTENIDO: BUSCADOR + FILTROS + ROSTER -------- -->
-    <section class="lg:col-span-3">
+    <!-- Línea Divisoria Fina -->
+    <div class="border-t mb-4" style="border-color: var(--border);"></div>
 
-      <!-- Ficha de equipo activo -->
-      <div id="team-summary" class="bg-slate-800 border border-slate-700 rounded-2xl p-5 mb-6 flex flex-wrap items-center gap-6"></div>
+    <!-- Temas de Color -->
+    <h3 class="text-sm font-bold mb-3 text-center uppercase tracking-wider" style="color: var(--text-muted);">Color de Acento</h3>
+    
+    <!-- Botón Predeterminado -->
+    <button id="btn-default" class="w-full py-2 mb-3 text-sm font-medium rounded-lg border transition hover:opacity-80" style="border-color: var(--border); color: var(--text-main);">
+      Predeterminado
+    </button>
 
-      <!-- Buscador -->
-      <div class="relative mb-4">
-        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-slate-500 absolute left-4 top-1/2 -translate-y-1/2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35M17 11a6 6 0 11-12 0 6 6 0 0112 0z"/></svg>
-        <input id="search-input" type="text" placeholder="Buscar jugador por nombre..."
-          class="w-full bg-slate-800 border border-slate-700 rounded-xl py-3.5 pl-12 pr-4 text-sm placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/60 focus:border-emerald-500 transition-all duration-300">
-      </div>
-
-      <!-- Pestañas de filtrado por posición -->
-      <div id="position-tabs" class="flex flex-wrap gap-2 mb-6"></div>
-
-      <!-- Roster / grid de jugadores -->
-      <div id="roster-grid" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4"></div>
-      <p id="empty-state" class="hidden text-center text-slate-500 py-16 text-sm">No se encontraron jugadores con esos criterios.</p>
-    </section>
-  </main>
-
-  <!-- ============ MODAL DE DETALLE DE JUGADOR ============ -->
-  <div id="player-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
-    <div id="modal-content" class="modal-enter bg-slate-800 border border-slate-700 rounded-2xl max-w-lg w-full max-h-[85vh] overflow-y-auto shadow-2xl shadow-black/50"></div>
+    <!-- Grid 3x2 de Colores -->
+    <div class="grid grid-cols-3 gap-3 justify-items-center">
+      <button data-color="azul" class="theme-btn w-8 h-8 rounded-full bg-blue-600 border-2 border-transparent hover:scale-110 transition-all duration-300" title="Azul"></button>
+      <button data-color="rojo" class="theme-btn w-8 h-8 rounded-full bg-red-600 border-2 border-transparent hover:scale-110 transition-all duration-300" title="Rojo"></button>
+      <button data-color="morado" class="theme-btn w-8 h-8 rounded-full bg-purple-600 border-2 border-transparent hover:scale-110 transition-all duration-300" title="Morado"></button>
+      <button data-color="rosa" class="theme-btn w-8 h-8 rounded-full bg-pink-600 border-2 border-transparent hover:scale-110 transition-all duration-300" title="Rosa"></button>
+      <button data-color="naranja" class="theme-btn w-8 h-8 rounded-full bg-orange-600 border-2 border-transparent hover:scale-110 transition-all duration-300" title="Naranja"></button>
+      <button data-color="amarillo" class="theme-btn w-8 h-8 rounded-full bg-yellow-600 border-2 border-transparent hover:scale-110 transition-all duration-300" title="Amarillo"></button>
+    </div>
   </div>
 
-  <!-- Toast de confirmación de descarga -->
-  <div id="toast" class="hidden fixed bottom-6 right-6 z-50 bg-slate-800 border border-emerald-500/50 text-sm px-5 py-3 rounded-xl shadow-xl transition-all duration-300"></div>
+  <!-- =========================================================================
+       MAIN CONTENT
+       ========================================================================= -->
+  <main class="max-w-7xl mx-auto px-4 py-8">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      
+      <!-- Sidebar: Tabla de Posiciones -->
+      <aside class="lg:col-span-1">
+        <div class="sticky top-24 bg-slate-800 rounded-2xl border border-slate-700 p-6">
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="text-lg font-bold text-slate-100">Tabla de Posiciones</h2>
+            <span class="text-xs text-slate-500">Fase de grupos</span>
+          </div>
+          <div id="standings" class="space-y-3"></div>
+        </div>
+      </aside>
 
-<script>
-/* =========================================================================
-   BASE DE DATOS LOCAL (MOCK DATA)
-   Estructura: 3 equipos, cada uno con estadísticas colectivas y 11 jugadores.
-   Cada jugador posee estadísticas tradicionales. Los porteros incluyen,
-   de forma EXCLUSIVA, el campo "paradas".
-   ========================================================================= */
-const TEAMS = [
-  {
-    id: "arg", nombre: "Argentina", bandera: "🇦🇷", color: "cyan",
-    puntos: 15, pj: 6, gf: 12, gc: 3, dg: 9, forma: "VVEVV",
-    jugadores: [
-      { dorsal: 23, nombre: "Emiliano Martínez", posicion: "Portero", stats: { puntos: 78, asistencias: 0, rebotes: 4, pases: 145, tirosPuerta: 0, goles: 0, paradas: 27 } },
-      { dorsal: 26, nombre: "Nahuel Molina", posicion: "Defensa", stats: { puntos: 68, asistencias: 2, rebotes: 12, pases: 210, tirosPuerta: 3, goles: 0 } },
-      { dorsal: 13, nombre: "Cristian Romero", posicion: "Defensa", stats: { puntos: 71, asistencias: 0, rebotes: 18, pases: 195, tirosPuerta: 1, goles: 1 } },
-      { dorsal: 19, nombre: "Nicolás Otamendi", posicion: "Defensa", stats: { puntos: 65, asistencias: 0, rebotes: 22, pases: 180, tirosPuerta: 2, goles: 0 } },
-      { dorsal: 3, nombre: "Nicolás Tagliafico", posicion: "Defensa", stats: { puntos: 63, asistencias: 1, rebotes: 15, pases: 170, tirosPuerta: 1, goles: 0 } },
-      { dorsal: 7, nombre: "Rodrigo De Paul", posicion: "Mediocampista", stats: { puntos: 82, asistencias: 3, rebotes: 9, pases: 320, tirosPuerta: 5, goles: 1 } },
-      { dorsal: 24, nombre: "Enzo Fernández", posicion: "Mediocampista", stats: { puntos: 85, asistencias: 2, rebotes: 8, pases: 340, tirosPuerta: 7, goles: 2 } },
-      { dorsal: 20, nombre: "Alexis Mac Allister", posicion: "Mediocampista", stats: { puntos: 80, asistencias: 4, rebotes: 7, pases: 290, tirosPuerta: 6, goles: 1 } },
-      { dorsal: 11, nombre: "Ángel Di María", posicion: "Mediocampista", stats: { puntos: 79, asistencias: 5, rebotes: 6, pases: 250, tirosPuerta: 8, goles: 2 } },
-      { dorsal: 10, nombre: "Lionel Messi", posicion: "Delantero", stats: { puntos: 95, asistencias: 4, rebotes: 3, pases: 260, tirosPuerta: 15, goles: 5 } },
-      { dorsal: 9, nombre: "Julián Álvarez", posicion: "Delantero", stats: { puntos: 88, asistencias: 2, rebotes: 4, pases: 180, tirosPuerta: 12, goles: 4 } }
-    ]
-  },
-  {
-    id: "fra", nombre: "Francia", bandera: "🇫🇷", color: "emerald",
-    puntos: 12, pj: 6, gf: 10, gc: 6, dg: 4, forma: "VEVDV",
-    jugadores: [
-      { dorsal: 16, nombre: "Mike Maignan", posicion: "Portero", stats: { puntos: 74, asistencias: 0, rebotes: 3, pases: 130, tirosPuerta: 0, goles: 0, paradas: 22 } },
-      { dorsal: 5, nombre: "Jules Koundé", posicion: "Defensa", stats: { puntos: 66, asistencias: 1, rebotes: 14, pases: 200, tirosPuerta: 1, goles: 0 } },
-      { dorsal: 17, nombre: "William Saliba", posicion: "Defensa", stats: { puntos: 70, asistencias: 0, rebotes: 20, pases: 210, tirosPuerta: 1, goles: 1 } },
-      { dorsal: 22, nombre: "Theo Hernández", posicion: "Defensa", stats: { puntos: 72, asistencias: 3, rebotes: 11, pases: 230, tirosPuerta: 4, goles: 1 } },
-      { dorsal: 3, nombre: "Ibrahima Konaté", posicion: "Defensa", stats: { puntos: 62, asistencias: 0, rebotes: 19, pases: 175, tirosPuerta: 0, goles: 0 } },
-      { dorsal: 8, nombre: "Aurélien Tchouaméni", posicion: "Mediocampista", stats: { puntos: 77, asistencias: 1, rebotes: 10, pases: 310, tirosPuerta: 3, goles: 0 } },
-      { dorsal: 14, nombre: "Adrien Rabiot", posicion: "Mediocampista", stats: { puntos: 73, asistencias: 2, rebotes: 8, pases: 260, tirosPuerta: 5, goles: 2 } },
-      { dorsal: 13, nombre: "N'Golo Kanté", posicion: "Mediocampista", stats: { puntos: 76, asistencias: 1, rebotes: 12, pases: 275, tirosPuerta: 2, goles: 1 } },
-      { dorsal: 7, nombre: "Antoine Griezmann", posicion: "Mediocampista", stats: { puntos: 84, asistencias: 5, rebotes: 6, pases: 300, tirosPuerta: 9, goles: 3 } },
-      { dorsal: 10, nombre: "Kylian Mbappé", posicion: "Delantero", stats: { puntos: 93, asistencias: 3, rebotes: 3, pases: 220, tirosPuerta: 18, goles: 6 } },
-      { dorsal: 11, nombre: "Ousmane Dembélé", posicion: "Delantero", stats: { puntos: 81, asistencias: 4, rebotes: 4, pases: 190, tirosPuerta: 10, goles: 2 } }
-    ]
-  },
-  {
-    id: "bra", nombre: "Brasil", bandera: "🇧🇷", color: "emerald",
-    puntos: 13, pj: 6, gf: 14, gc: 8, dg: 6, forma: "VVDEV",
-    jugadores: [
-      { dorsal: 1, nombre: "Alisson", posicion: "Portero", stats: { puntos: 76, asistencias: 0, rebotes: 5, pases: 150, tirosPuerta: 0, goles: 0, paradas: 24 } },
-      { dorsal: 4, nombre: "Marquinhos", posicion: "Defensa", stats: { puntos: 69, asistencias: 0, rebotes: 16, pases: 220, tirosPuerta: 1, goles: 0 } },
-      { dorsal: 3, nombre: "Éder Militão", posicion: "Defensa", stats: { puntos: 65, asistencias: 0, rebotes: 18, pases: 200, tirosPuerta: 1, goles: 0 } },
-      { dorsal: 2, nombre: "Danilo", posicion: "Defensa", stats: { puntos: 64, asistencias: 1, rebotes: 13, pases: 190, tirosPuerta: 2, goles: 0 } },
-      { dorsal: 6, nombre: "Wendell", posicion: "Defensa", stats: { puntos: 60, asistencias: 2, rebotes: 10, pases: 175, tirosPuerta: 1, goles: 0 } },
-      { dorsal: 5, nombre: "Casemiro", posicion: "Mediocampista", stats: { puntos: 78, asistencias: 1, rebotes: 14, pases: 300, tirosPuerta: 4, goles: 1 } },
-      { dorsal: 17, nombre: "Bruno Guimarães", posicion: "Mediocampista", stats: { puntos: 80, asistencias: 3, rebotes: 9, pases: 310, tirosPuerta: 6, goles: 2 } },
-      { dorsal: 8, nombre: "Lucas Paquetá", posicion: "Mediocampista", stats: { puntos: 79, asistencias: 4, rebotes: 7, pases: 280, tirosPuerta: 7, goles: 2 } },
-      { dorsal: 19, nombre: "Rodrygo", posicion: "Mediocampista", stats: { puntos: 83, asistencias: 3, rebotes: 5, pases: 240, tirosPuerta: 9, goles: 3 } },
-      { dorsal: 7, nombre: "Vinícius Júnior", posicion: "Delantero", stats: { puntos: 90, asistencias: 4, rebotes: 3, pases: 210, tirosPuerta: 14, goles: 5 } },
-      { dorsal: 10, nombre: "Neymar Jr", posicion: "Delantero", stats: { puntos: 92, asistencias: 6, rebotes: 4, pases: 230, tirosPuerta: 13, goles: 4 } }
-    ]
-  }
-];
-
-const POSITIONS = ["Todos", "Portero", "Defensa", "Mediocampista", "Delantero"];
-const FORM_LABELS = { V: "Victoria", E: "Empate", D: "Derrota" };
-const FORM_COLORS = { V: "bg-emerald-500", E: "bg-slate-500", D: "bg-rose-500" };
-
-// ---- Estado de la aplicación ----
-let state = {
-  activeTeamId: TEAMS[0].id,
-  positionFilter: "Todos",
-  searchTerm: ""
-};
-
-/* =========================================================================
-   HELPERS
-   ========================================================================= */
-function getActiveTeam() {
-  return TEAMS.find(t => t.id === state.activeTeamId);
-}
-
-// Icono simple por posición (para las tarjetas y el modal)
-function positionIcon(pos) {
-  const icons = {
-    "Portero": "🧤",
-    "Defensa": "🛡️",
-    "Mediocampista": "🎯",
-    "Delantero": "⚡"
-  };
-  return icons[pos] || "⚽";
-}
-
-function showToast(message) {
-  const toast = document.getElementById("toast");
-  toast.textContent = message;
-  toast.classList.remove("hidden");
-  setTimeout(() => toast.classList.add("hidden"), 2500);
-}
-
-/* =========================================================================
-   RENDER: PESTAÑAS DE EQUIPO
-   ========================================================================= */
-function renderTeamTabs() {
-  const nav = document.getElementById("team-tabs");
-  nav.innerHTML = TEAMS.map(team => {
-    const active = team.id === state.activeTeamId;
-    return `
-      <button data-team="${team.id}"
-        class="team-tab px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300
-        ${active ? "bg-emerald-500 text-slate-900 shadow-lg shadow-emerald-500/20" : "text-slate-300 hover:bg-slate-700/60"}">
-        ${team.bandera} ${team.nombre}
-      </button>`;
-  }).join("");
-
-  nav.querySelectorAll(".team-tab").forEach(btn => {
-    btn.addEventListener("click", () => {
-      state.activeTeamId = btn.dataset.team;
-      state.searchTerm = "";
-      document.getElementById("search-input").value = "";
-      renderAll();
-    });
-  });
-}
-
-/* =========================================================================
-   RENDER: TABLA DE POSICIONES (SIDEBAR)
-   ========================================================================= */
-function renderStandings() {
-  // Ordena los equipos por puntos y, en caso de empate, por diferencia de gol
-  const ordered = [...TEAMS].sort((a, b) => b.puntos - a.puntos || b.dg - a.dg);
-  const tbody = document.getElementById("standings-body");
-
-  tbody.innerHTML = ordered.map((team, idx) => `
-    <tr data-team="${team.id}"
-      class="standing-row cursor-pointer border-b border-slate-700/50 last:border-0 hover:bg-slate-700/40 transition-all duration-300 ${team.id === state.activeTeamId ? "bg-emerald-500/10" : ""}">
-      <td class="py-2.5 flex items-center gap-2">
-        <span class="text-xs text-slate-500 w-3">${idx + 1}</span>
-        <span>${team.bandera}</span>
-        <span class="font-medium">${team.nombre}</span>
-      </td>
-      <td class="text-center text-slate-300">${team.pj}</td>
-      <td class="text-center ${team.dg >= 0 ? "text-emerald-400" : "text-rose-400"}">${team.dg >= 0 ? "+" : ""}${team.dg}</td>
-      <td class="text-center font-display font-bold text-cyan-400">${team.puntos}</td>
-    </tr>
-  `).join("");
-
-  tbody.querySelectorAll(".standing-row").forEach(row => {
-    row.addEventListener("click", () => {
-      state.activeTeamId = row.dataset.team;
-      renderAll();
-    });
-  });
-
-  // Leyenda de forma reciente del equipo activo
-  const active = getActiveTeam();
-  const legend = document.getElementById("form-legend");
-  legend.innerHTML = `
-    <div class="flex items-center justify-between">
-      <span class="text-sm text-slate-300">${active.bandera} ${active.nombre}</span>
-      <div class="flex gap-1">
-        ${active.forma.split("").map(c => `
-          <span title="${FORM_LABELS[c]}" class="w-6 h-6 rounded-full ${FORM_COLORS[c]} flex items-center justify-center text-[10px] font-bold text-slate-900">${c}</span>
-        `).join("")}
-      </div>
-    </div>`;
-}
-
-/* =========================================================================
-   RENDER: RESUMEN DEL EQUIPO ACTIVO
-   ========================================================================= */
-function renderTeamSummary() {
-  const team = getActiveTeam();
-  const box = document.getElementById("team-summary");
-  const stats = [
-    { label: "Puntos", value: team.puntos, accent: "text-cyan-400" },
-    { label: "Jugados", value: team.pj, accent: "text-slate-100" },
-    { label: "Goles a Favor", value: team.gf, accent: "text-emerald-400" },
-    { label: "Goles en Contra", value: team.gc, accent: "text-rose-400" },
-    { label: "Diferencia", value: (team.dg >= 0 ? "+" : "") + team.dg, accent: "text-emerald-400" }
-  ];
-  box.innerHTML = `
-    <div class="flex items-center gap-3 pr-6 border-r border-slate-700">
-      <span class="text-4xl">${team.bandera}</span>
-      <div>
-        <h2 class="font-display font-bold text-2xl leading-none">${team.nombre}</h2>
-        <p class="text-xs text-slate-400 mt-1">Plantilla · 11 jugadores</p>
-      </div>
-    </div>
-    ${stats.map(s => `
-      <div class="text-center">
-        <p class="font-display font-bold text-2xl ${s.accent}">${s.value}</p>
-        <p class="text-[11px] uppercase tracking-wider text-slate-500">${s.label}</p>
-      </div>
-    `).join("")}
-  `;
-}
-
-/* =========================================================================
-   RENDER: PESTAÑAS DE FILTRADO POR POSICIÓN
-   ========================================================================= */
-function renderPositionTabs() {
-  const container = document.getElementById("position-tabs");
-  container.innerHTML = POSITIONS.map(pos => {
-    const active = pos === state.positionFilter;
-    return `
-      <button data-position="${pos}"
-        class="position-tab px-4 py-2 rounded-full text-sm font-medium border transition-all duration-300
-        ${active
-          ? "bg-cyan-400 text-slate-900 border-cyan-400"
-          : "border-slate-700 text-slate-300 hover:border-cyan-400/60 hover:text-cyan-400"}">
-        ${pos}
-      </button>`;
-  }).join("");
-
-  container.querySelectorAll(".position-tab").forEach(btn => {
-    btn.addEventListener("click", () => {
-      state.positionFilter = btn.dataset.position;
-      renderAll();
-    });
-  });
-}
-
-/* =========================================================================
-   FILTRADO Y MAPEO DEL ROSTER ACTIVO
-   Combina: equipo seleccionado + filtro de posición + término de búsqueda.
-   ========================================================================= */
-function getFilteredRoster() {
-  const team = getActiveTeam();
-  return team.jugadores
-    // 1) Filtra por posición, salvo que esté seleccionado "Todos"
-    .filter(p => state.positionFilter === "Todos" || p.posicion === state.positionFilter)
-    // 2) Filtra por coincidencia de nombre en tiempo real (búsqueda insensible a mayúsculas)
-    .filter(p => p.nombre.toLowerCase().includes(state.searchTerm.toLowerCase()));
-}
-
-/* =========================================================================
-   RENDER: GRID DE TARJETAS DE JUGADORES
-   ========================================================================= */
-function renderRoster() {
-  const grid = document.getElementById("roster-grid");
-  const emptyState = document.getElementById("empty-state");
-  const roster = getFilteredRoster();
-  const team = getActiveTeam();
-
-  if (roster.length === 0) {
-    grid.innerHTML = "";
-    emptyState.classList.remove("hidden");
-    return;
-  }
-  emptyState.classList.add("hidden");
-
-  // Mapea cada jugador filtrado a una tarjeta interactiva
-  grid.innerHTML = roster.map((player, i) => `
-    <button data-dorsal="${player.dorsal}"
-      class="player-card card-enter text-left bg-slate-800 border border-slate-700 rounded-2xl p-5 hover:border-emerald-500/60 hover:-translate-y-1 hover:shadow-xl hover:shadow-emerald-500/10 transition-all duration-300"
-      style="animation-delay:${i * 30}ms">
-      <div class="flex items-start justify-between mb-4">
-        <span class="font-display font-bold text-3xl text-slate-600 group-hover:text-emerald-400">#${player.dorsal}</span>
-        <span class="text-xs px-2.5 py-1 rounded-full bg-slate-700/70 text-cyan-400 flex items-center gap-1">
-          ${positionIcon(player.posicion)} ${player.posicion}
-        </span>
-      </div>
-      <h3 class="font-semibold text-base mb-1">${player.nombre}</h3>
-      <p class="text-xs text-slate-400 mb-4">${team.bandera} ${team.nombre}</p>
-      <div class="flex items-center gap-4 text-xs text-slate-400">
-        <span>⚽ <span class="text-slate-100 font-medium">${player.stats.goles}</span></span>
-        <span>🎯 <span class="text-slate-100 font-medium">${player.stats.asistencias}</span></span>
-        ${player.posicion === "Portero"
-          ? `<span>🧤 <span class="text-slate-100 font-medium">${player.stats.paradas}</span></span>`
-          : `<span>🔁 <span class="text-slate-100 font-medium">${player.stats.pases}</span></span>`}
-      </div>
-    </button>
-  `).join("");
-
-  grid.querySelectorAll(".player-card").forEach(card => {
-    card.addEventListener("click", () => openPlayerModal(parseInt(card.dataset.dorsal)));
-  });
-}
-
-/* =========================================================================
-   MODAL DE DETALLE DE JUGADOR
-   Renderiza dinámicamente los bloques numéricos según el rol del jugador.
-   ========================================================================= */
-function openPlayerModal(dorsal) {
-  const team = getActiveTeam();
-  const player = team.jugadores.find(p => p.dorsal === dorsal);
-  if (!player) return;
-
-  // Bloques base compartidos por todas las posiciones
-  const baseBlocks = [
-    { label: "Puntos", value: player.stats.puntos, accent: "text-cyan-400" },
-    { label: "Goles", value: player.stats.goles, accent: "text-emerald-400" },
-    { label: "Asistencias", value: player.stats.asistencias, accent: "text-emerald-400" },
-    { label: "Tiros a Puerta", value: player.stats.tirosPuerta, accent: "text-slate-100" },
-    { label: "Pases", value: player.stats.pases, accent: "text-slate-100" },
-    { label: "Rebotes", value: player.stats.rebotes, accent: "text-slate-100" }
-  ];
-
-  // Bloque exclusivo para porteros
-  if (player.posicion === "Portero") {
-    baseBlocks.splice(1, 0, { label: "Paradas", value: player.stats.paradas, accent: "text-cyan-400" });
-  }
-
-  const modal = document.getElementById("player-modal");
-  const content = document.getElementById("modal-content");
-
-  content.innerHTML = `
-    <div class="p-6 bg-gradient-to-br from-emerald-500/10 to-cyan-400/5 border-b border-slate-700">
-      <div class="flex items-start justify-between">
-        <div class="flex items-center gap-4">
-          <span class="font-display font-bold text-5xl text-emerald-400">#${player.dorsal}</span>
-          <div>
-            <h2 class="font-display font-bold text-2xl">${player.nombre}</h2>
-            <p class="text-sm text-slate-400 flex items-center gap-2 mt-1">
-              ${positionIcon(player.posicion)} ${player.posicion} · ${team.bandera} ${team.nombre}
-            </p>
+      <!-- Área Principal -->
+      <section class="lg:col-span-2 space-y-6">
+        
+        <!-- Barra de búsqueda y filtros -->
+        <div class="bg-slate-800 rounded-2xl border border-slate-700 p-4 flex flex-col sm:flex-row gap-4">
+          <div class="relative flex-1">
+            <svg xmlns="http://www.w3.org/2000/svg" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+            </svg>
+            <input id="search-input" type="text" placeholder="Buscar jugador..." class="w-full pl-10 pr-4 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/60 focus:border-emerald-500 transition">
+          </div>
+          <div class="flex gap-2 overflow-x-auto">
+            <button data-pos="all" class="pos-filter px-3 py-2 rounded-lg text-xs font-medium bg-emerald-500 text-white whitespace-nowrap">Todos</button>
+            <button data-pos="Portero" class="pos-filter px-3 py-2 rounded-lg text-xs font-medium bg-slate-700 text-slate-300 hover:bg-slate-600 whitespace-nowrap">Porteros</button>
+            <button data-pos="Defensa" class="pos-filter px-3 py-2 rounded-lg text-xs font-medium bg-slate-700 text-slate-300 hover:bg-slate-600 whitespace-nowrap">Defensas</button>
+            <button data-pos="Mediocampista" class="pos-filter px-3 py-2 rounded-lg text-xs font-medium bg-slate-700 text-slate-300 hover:bg-slate-600 whitespace-nowrap">Medios</button>
+            <button data-pos="Delantero" class="pos-filter px-3 py-2 rounded-lg text-xs font-medium bg-slate-700 text-slate-300 hover:bg-slate-600 whitespace-nowrap">Delanteros</button>
           </div>
         </div>
-        <button id="modal-close" class="text-slate-400 hover:text-rose-400 transition-all duration-300 text-2xl leading-none">&times;</button>
-      </div>
-    </div>
-    <div class="p-6 grid grid-cols-2 sm:grid-cols-3 gap-4">
-      ${baseBlocks.map(b => `
-        <div class="bg-slate-900/60 border border-slate-700 rounded-xl p-4 text-center hover:border-emerald-500/50 transition-all duration-300">
-          <p class="font-display font-bold text-2xl ${b.accent}">${b.value}</p>
-          <p class="text-[11px] uppercase tracking-wider text-slate-500 mt-1">${b.label}</p>
+
+        <!-- Grid de Jugadores -->
+        <div id="players-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-4"></div>
+        
+        <!-- Mensaje vacío -->
+        <div id="empty-state" class="hidden text-center py-12">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-12 h-12 mx-auto text-slate-600 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+          <p class="text-slate-500">No se encontraron jugadores con esos criterios.</p>
         </div>
-      `).join("")}
+      </section>
     </div>
-  `;
+  </main>
 
-  modal.classList.remove("hidden");
-  document.getElementById("modal-close").addEventListener("click", closePlayerModal);
-}
+  <!-- =========================================================================
+       MODAL DE DETALLE
+       ========================================================================= -->
+  <div id="player-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm fade-in">
+    <div class="bg-slate-800 rounded-2xl border border-slate-700 max-w-2xl w-full max-h-[90vh] overflow-y-auto modal-enter">
+      <div id="modal-content"></div>
+    </div>
+  </div>
 
-function closePlayerModal() {
-  document.getElementById("player-modal").classList.add("hidden");
-}
+  <!-- =========================================================================
+       JAVASCRIPT
+       ========================================================================= -->
+  <script>
+    // =========================================================================
+    // BASE DE DATOS
+    // =========================================================================
+    const TEAMS = {
+      "Argentina": [
+        {dorsal:23, nombre:"Emiliano Martínez", posicion:"Portero", puntos:78, asistencias:0, rebotes:4, pases:145, tiros:0, goles:0, paradas:27},
+        {dorsal:26, nombre:"Nahuel Molina", posicion:"Defensa", puntos:68, asistencias:2, rebotes:12, pases:210, tiros:3, goles:0, paradas:""},
+        {dorsal:13, nombre:"Cristian Romero", posicion:"Defensa", puntos:71, asistencias:0, rebotes:18, pases:195, tiros:1, goles:1, paradas:""},
+        {dorsal:19, nombre:"Nicolás Otamendi", posicion:"Defensa", puntos:65, asistencias:0, rebotes:22, pases:180, tiros:2, goles:0, paradas:""},
+        {dorsal:3, nombre:"Nicolás Tagliafico", posicion:"Defensa", puntos:63, asistencias:1, rebotes:15, pases:170, tiros:1, goles:0, paradas:""},
+        {dorsal:7, nombre:"Rodrigo De Paul", posicion:"Mediocampista", puntos:82, asistencias:3, rebotes:9, pases:320, tiros:5, goles:1, paradas:""},
+        {dorsal:24, nombre:"Enzo Fernández", posicion:"Mediocampista", puntos:85, asistencias:2, rebotes:8, pases:340, tiros:7, goles:2, paradas:""},
+        {dorsal:20, nombre:"Alexis Mac Allister", posicion:"Mediocampista", puntos:80, asistencias:4, rebotes:7, pases:290, tiros:6, goles:1, paradas:""},
+        {dorsal:11, nombre:"Ángel Di María", posicion:"Mediocampista", puntos:79, asistencias:5, rebotes:6, pases:250, tiros:8, goles:2, paradas:""},
+        {dorsal:10, nombre:"Lionel Messi", posicion:"Delantero", puntos:95, asistencias:4, rebotes:3, pases:260, tiros:15, goles:5, paradas:""},
+        {dorsal:9, nombre:"Julián Álvarez", posicion:"Delantero", puntos:88, asistencias:2, rebotes:4, pases:180, tiros:12, goles:4, paradas:""}
+      ],
+      "Francia": [
+        {dorsal:16, nombre:"Mike Maignan", posicion:"Portero", puntos:74, asistencias:0, rebotes:3, pases:130, tiros:0, goles:0, paradas:22},
+        {dorsal:5, nombre:"Jules Koundé", posicion:"Defensa", puntos:66, asistencias:1, rebotes:14, pases:200, tiros:1, goles:0, paradas:""},
+        {dorsal:17, nombre:"William Saliba", posicion:"Defensa", puntos:70, asistencias:0, rebotes:20, pases:210, tiros:1, goles:1, paradas:""},
+        {dorsal:22, nombre:"Theo Hernández", posicion:"Defensa", puntos:72, asistencias:3, rebotes:11, pases:230, tiros:4, goles:1, paradas:""},
+        {dorsal:3, nombre:"Ibrahima Konaté", posicion:"Defensa", puntos:62, asistencias:0, rebotes:19, pases:175, tiros:0, goles:0, paradas:""},
+        {dorsal:8, nombre:"Aurélien Tchouaméni", posicion:"Mediocampista", puntos:77, asistencias:1, rebotes:10, pases:310, tiros:3, goles:0, paradas:""},
+        {dorsal:14, nombre:"Adrien Rabiot", posicion:"Mediocampista", puntos:73, asistencias:2, rebotes:8, pases:260, tiros:5, goles:2, paradas:""},
+        {dorsal:13, nombre:"N'Golo Kanté", posicion:"Mediocampista", puntos:76, asistencias:1, rebotes:12, pases:275, tiros:2, goles:1, paradas:""},
+        {dorsal:7, nombre:"Antoine Griezmann", posicion:"Mediocampista", puntos:84, asistencias:5, rebotes:6, pases:300, tiros:9, goles:3, paradas:""},
+        {dorsal:10, nombre:"Kylian Mbappé", posicion:"Delantero", puntos:93, asistencias:3, rebotes:3, pases:220, tiros:18, goles:6, paradas:""},
+        {dorsal:11, nombre:"Ousmane Dembélé", posicion:"Delantero", puntos:81, asistencias:4, rebotes:4, pases:190, tiros:10, goles:2, paradas:""}
+      ],
+      "Brasil": [
+        {dorsal:1, nombre:"Alisson", posicion:"Portero", puntos:76, asistencias:0, rebotes:5, pases:150, tiros:0, goles:0, paradas:24},
+        {dorsal:4, nombre:"Marquinhos", posicion:"Defensa", puntos:69, asistencias:0, rebotes:16, pases:220, tiros:1, goles:0, paradas:""},
+        {dorsal:3, nombre:"Éder Militão", posicion:"Defensa", puntos:65, asistencias:0, rebotes:18, pases:200, tiros:1, goles:0, paradas:""},
+        {dorsal:2, nombre:"Danilo", posicion:"Defensa", puntos:64, asistencias:1, rebotes:13, pases:190, tiros:2, goles:0, paradas:""},
+        {dorsal:6, nombre:"Wendell", posicion:"Defensa", puntos:60, asistencias:2, rebotes:10, pases:175, tiros:1, goles:0, paradas:""},
+        {dorsal:5, nombre:"Casemiro", posicion:"Mediocampista", puntos:78, asistencias:1, rebotes:14, pases:300, tiros:4, goles:1, paradas:""},
+        {dorsal:17, nombre:"Bruno Guimarães", posicion:"Mediocampista", puntos:80, asistencias:3, rebotes:9, pases:310, tiros:6, goles:2, paradas:""},
+        {dorsal:8, nombre:"Lucas Paquetá", posicion:"Mediocampista", puntos:79, asistencias:4, rebotes:7, pases:280, tiros:7, goles:2, paradas:""},
+        {dorsal:19, nombre:"Rodrygo", posicion:"Mediocampista", puntos:83, asistencias:3, rebotes:5, pases:240, tiros:9, goles:3, paradas:""},
+        {dorsal:7, nombre:"Vinícius Júnior", posicion:"Delantero", puntos:90, asistencias:4, rebotes:3, pases:210, tiros:14, goles:5, paradas:""},
+        {dorsal:10, nombre:"Neymar Jr", posicion:"Delantero", puntos:92, asistencias:6, rebotes:4, pases:230, tiros:13, goles:4, paradas:""}
+      ]
+    };
 
-/* =========================================================================
-   SISTEMA DE EXPORTACIÓN INTEROPERABLE
-   Genera y descarga los datos en TXT (ASCII), MD y CSV.
-   ========================================================================= */
+    const TEAM_FLAGS = { "Argentina":"🇦🇷", "Francia":"🇫🇷", "Brasil":"🇧🇷" };
 
-// --- Genera un reporte visual en arte ASCII de todos los jugadores ---
-function generateASCII() {
-  let out = "";
-  out += "================================================================\n";
-  out += "   ELITE SCOUT — FICHAS INDIVIDUALES (REPORTE CUERPO TECNICO)\n";
-  out += "================================================================\n\n";
+    // =========================================================================
+    // ESTADO GLOBAL
+    // =========================================================================
+    const state = {
+      team: "Argentina",
+      search: "",
+      position: "all"
+    };
 
-  TEAMS.forEach(team => {
-    out += `>> EQUIPO: ${team.nombre.toUpperCase()}  (Pts:${team.puntos} PJ:${team.pj} DG:${team.dg >= 0 ? "+" : ""}${team.dg} Forma:${team.forma})\n`;
-    out += "----------------------------------------------------------------\n\n";
+    // =========================================================================
+    // FUNCIONES DE RENDERIZADO
+    // =========================================================================
+    function renderStandings() {
+      const container = document.getElementById('standings');
+      const standings = Object.keys(TEAMS).map(team => {
+        const players = TEAMS[team];
+        const pts = players.reduce((s, p) => s + p.puntos, 0);
+        const goles = players.reduce((s, p) => s + (p.goles || 0), 0);
+        const paradas = players.reduce((s, p) => s + (p.paradas || 0), 0);
+        return { team, pts, dg: goles + paradas, pj: players.length };
+      }).sort((a, b) => b.pts - a.pts);
 
-    team.jugadores.forEach(p => {
-      const title = `#${p.dorsal}  ${p.nombre.toUpperCase()}`;
-      const subtitle = `${p.posicion} - ${team.nombre}`;
-      const width = 46;
-      const pad = (s) => " " + s.padEnd(width - 2, " ") + " ";
+      container.innerHTML = standings.map((s, i) => `
+        <div class="flex items-center justify-between p-3 rounded-xl bg-slate-900/60 border border-slate-700/50 hover:border-emerald-500/60 transition cursor-pointer ${state.team === s.team ? 'border-emerald-500/50' : ''}" onclick="selectTeam('${s.team}')">
+          <div class="flex items-center gap-3">
+            <span class="text-lg font-bold ${i === 0 ? 'text-emerald-400' : 'text-slate-500'}">#${i + 1}</span>
+            <span class="text-2xl">${TEAM_FLAGS[s.team]}</span>
+            <div>
+              <p class="font-semibold text-slate-100 text-sm">${s.team}</p>
+              <p class="text-xs text-slate-500">PJ: ${s.pj} · DG: +${s.dg}</p>
+            </div>
+          </div>
+          <span class="text-lg font-bold text-emerald-400">${s.pts}</span>
+        </div>
+      `).join('');
+    }
 
-      out += "+" + "-".repeat(width) + "+\n";
-      out += "|" + pad(title) + "|\n";
-      out += "|" + pad(subtitle) + "|\n";
-      out += "+" + "-".repeat(width) + "+\n";
-      out += "|" + pad(`Goles ..............  ${p.stats.goles}`) + "|\n";
-      out += "|" + pad(`Asistencias .........  ${p.stats.asistencias}`) + "|\n";
-      out += "|" + pad(`Tiros a puerta ......  ${p.stats.tirosPuerta}`) + "|\n";
-      out += "|" + pad(`Pases ...............  ${p.stats.pases}`) + "|\n";
-      out += "|" + pad(`Rebotes .............  ${p.stats.rebotes}`) + "|\n";
-      if (p.posicion === "Portero") {
-        out += "|" + pad(`Paradas .............  ${p.stats.paradas}`) + "|\n";
+    function renderPlayers() {
+      const grid = document.getElementById('players-grid');
+      const empty = document.getElementById('empty-state');
+      const players = TEAMS[state.team].filter(p => {
+        const matchSearch = p.nombre.toLowerCase().includes(state.search.toLowerCase());
+        const matchPos = state.position === 'all' || p.posicion === state.position;
+        return matchSearch && matchPos;
+      });
+
+      if (players.length === 0) {
+        grid.innerHTML = '';
+        empty.classList.remove('hidden');
+        return;
       }
-      out += "|" + pad(`Puntos (valoracion) .  ${p.stats.puntos}`) + "|\n";
-      out += "+" + "-".repeat(width) + "+\n\n";
-    });
-    out += "\n";
-  });
 
-  return out;
-}
+      empty.classList.add('hidden');
+      grid.innerHTML = players.map((p, i) => `
+        <div class="card-enter hover-lift bg-gradient-to-br from-emerald-500/10 to-cyan-400/5 rounded-2xl border border-slate-700 hover:border-emerald-500/60 hover:shadow-xl hover:shadow-emerald-500/10 p-5 cursor-pointer" style="animation-delay: ${i * 0.05}s" onclick="showModal('${state.team}', ${p.dorsal})">
+          <div class="flex justify-between items-start mb-3">
+            <div>
+              <p class="text-xs text-slate-500 mb-1">#${p.dorsal} · ${p.posicion}</p>
+              <h3 class="text-lg font-bold text-slate-100">${p.nombre}</h3>
+            </div>
+            <div class="text-3xl">${TEAM_FLAGS[state.team]}</div>
+          </div>
+          <div class="flex items-center gap-2 mb-3">
+            <div class="flex-1 h-2 bg-slate-700 rounded-full overflow-hidden">
+              <div class="stat-bar h-full bg-gradient-to-r from-emerald-500 to-cyan-400" style="width: ${p.puntos}%"></div>
+            </div>
+            <span class="text-sm font-bold text-emerald-400">${p.puntos}</span>
+          </div>
+          <div class="grid grid-cols-3 gap-2 text-center">
+            <div class="bg-slate-900/60 rounded-lg p-2">
+              <p class="text-xs text-slate-500">Goles</p>
+              <p class="font-bold text-slate-100">${p.goles || 0}</p>
+            </div>
+            <div class="bg-slate-900/60 rounded-lg p-2">
+              <p class="text-xs text-slate-500">Asist.</p>
+              <p class="font-bold text-slate-100">${p.asistencias}</p>
+            </div>
+            <div class="bg-slate-900/60 rounded-lg p-2">
+              <p class="text-xs text-slate-500">${p.posicion === 'Portero' ? 'Paradas' : 'Pases'}</p>
+              <p class="font-bold text-slate-100">${p.posicion === 'Portero' ? p.paradas : p.pases}</p>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
 
-// --- Genera documentación estructurada en Markdown ---
-function generateMarkdown() {
-  let out = "# Elite Scout — Base de Datos Deportiva\n\n";
-  out += "## Tabla de Posiciones\n\n";
-  out += "| # | Equipo | PJ | GF | GC | DG | Pts | Forma |\n";
-  out += "|---|--------|----|----|----|----|-----|-------|\n";
-
-  [...TEAMS].sort((a, b) => b.puntos - a.puntos).forEach((t, i) => {
-    out += `| ${i + 1} | ${t.bandera} ${t.nombre} | ${t.pj} | ${t.gf} | ${t.gc} | ${t.dg >= 0 ? "+" : ""}${t.dg} | ${t.puntos} | ${t.forma} |\n`;
-  });
-
-  TEAMS.forEach(team => {
-    out += `\n## ${team.bandera} ${team.nombre} — Plantilla\n\n`;
-    out += "| Dorsal | Nombre | Posición | Goles | Asist. | Tiros | Pases | Rebotes | Paradas |\n";
-    out += "|--------|--------|----------|-------|--------|-------|-------|---------|---------|\n";
-    team.jugadores.forEach(p => {
-      out += `| ${p.dorsal} | ${p.nombre} | ${p.posicion} | ${p.stats.goles} | ${p.stats.asistencias} | ${p.stats.tirosPuerta} | ${p.stats.pases} | ${p.stats.rebotes} | ${p.posicion === "Portero" ? p.stats.paradas : "—"} |\n`;
-    });
-  });
-
-  return out;
-}
-
-// --- Genera CSV tabular plano, optimizado para Excel / Sheets ---
-function generateCSV() {
-  const headers = ["Equipo", "Dorsal", "Nombre", "Posicion", "Puntos", "Asistencias", "Rebotes", "Pases", "TirosPuerta", "Goles", "Paradas"];
-  const rows = [headers.join(",")];
-
-  TEAMS.forEach(team => {
-    team.jugadores.forEach(p => {
-      const row = [
-        team.nombre,
-        p.dorsal,
-        `"${p.nombre}"`,
-        p.posicion,
-        p.stats.puntos,
-        p.stats.asistencias,
-        p.stats.rebotes,
-        p.stats.pases,
-        p.stats.tirosPuerta,
-        p.stats.goles,
-        p.posicion === "Portero" ? p.stats.paradas : ""
+    function showModal(team, dorsal) {
+      const player = TEAMS[team].find(p => p.dorsal === dorsal);
+      const modal = document.getElementById('player-modal');
+      const content = document.getElementById('modal-content');
+      
+      const stats = [
+        { label: "Puntos", value: player.puntos, max: 100 },
+        { label: "Goles", value: player.goles || 0, max: 20 },
+        { label: "Asistencias", value: player.asistencias, max: 10 },
+        { label: "Pases", value: player.pases, max: 350 },
+        { label: "Tiros al arco", value: player.tiros || 0, max: 20 }
       ];
-      rows.push(row.join(","));
+
+      content.innerHTML = `
+        <div class="p-6 border-b border-slate-700 flex justify-between items-center">
+          <div class="flex items-center gap-4">
+            <span class="text-4xl">${TEAM_FLAGS[team]}</span>
+            <div>
+              <p class="text-xs text-slate-500">#${player.dorsal} · ${player.posicion}</p>
+              <h2 class="text-2xl font-bold text-slate-100">${player.nombre}</h2>
+            </div>
+          </div>
+          <button onclick="closeModal()" class="p-2 hover:bg-slate-700 rounded-lg transition">
+            <svg class="w-5 h-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+          </button>
+        </div>
+        <div class="p-6 space-y-4">
+          ${stats.map(s => `
+            <div>
+              <div class="flex justify-between text-sm mb-1">
+                <span class="text-slate-400">${s.label}</span>
+                <span class="font-bold text-emerald-400">${s.value}</span>
+              </div>
+              <div class="h-2 bg-slate-700 rounded-full overflow-hidden">
+                <div class="stat-bar h-full bg-gradient-to-r from-emerald-500 to-cyan-400" style="width: ${Math.min((s.value/s.max)*100, 100)}%"></div>
+              </div>
+            </div>
+          `).join('')}
+          ${player.paradas ? `
+            <div class="mt-4 p-4 bg-slate-900/60 rounded-xl border border-slate-700">
+              <p class="text-sm text-slate-400 mb-2">Paradas totales</p>
+              <p class="text-3xl font-bold text-cyan-400">${player.paradas}</p>
+            </div>
+          ` : ''}
+        </div>
+      `;
+      
+      modal.classList.remove('hidden');
+    }
+
+    function closeModal() {
+      document.getElementById('player-modal').classList.add('hidden');
+    }
+
+    function selectTeam(team) {
+      state.team = team;
+      document.querySelectorAll('.team-tab').forEach(t => {
+        if (t.dataset.team === team) {
+          t.classList.add('bg-emerald-500', 'text-white');
+          t.classList.remove('text-slate-400');
+        } else {
+          t.classList.remove('bg-emerald-500', 'text-white');
+          t.classList.add('text-slate-400');
+        }
+      });
+      renderAll();
+    }
+
+    function renderAll() {
+      renderStandings();
+      renderPlayers();
+    }
+
+    // =========================================================================
+    // SISTEMA DE EXPORTACIÓN
+    // =========================================================================
+    function downloadFile(filename, content, type) {
+      const blob = new Blob([content], { type: type });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function exportCSV() {
+      let csv = "Equipo,Dorsal,Nombre,Posicion,Puntos,Asistencias,Rebotes,Pases,TirosPuerta,Goles,Paradas\n";
+      Object.keys(TEAMS).forEach(team => {
+        TEAMS[team].forEach(p => {
+          csv += `${team},${p.dorsal},"${p.nombre}",${p.posicion},${p.puntos},${p.asistencias},${p.rebotes},${p.pases},${p.tiros || 0},${p.goles || 0},${p.paradas || ''}\n`;
+        });
+      });
+      downloadFile('Base_Datos.csv', csv, 'text/csv');
+    }
+
+    function exportMD() {
+      let md = `# Elite Scout — Resumen del Dashboard\n\n`;
+      md += `## Tabla de Posiciones\n\n| Equipo | PJ | DG | Pts |\n|--------|----|----|----|\n`;
+      Object.keys(TEAMS).forEach(team => {
+        const players = TEAMS[team];
+        const pts = players.reduce((s, p) => s + p.puntos, 0);
+        const goles = players.reduce((s, p) => s + (p.goles || 0), 0);
+        md += `| ${TEAM_FLAGS[team]} ${team} | ${players.length} | +${goles} | ${pts} |\n`;
+      });
+      downloadFile('Tabla_Resumen.md', md, 'text/markdown');
+    }
+
+    function exportTXT() {
+      let txt = `================================================================\n`;
+      txt += `ELITE SCOUT — FICHAS INDIVIDUALES (REPORTE CUERPO TECNICO)\n`;
+      txt += `================================================================\n\n`;
+      Object.keys(TEAMS).forEach(team => {
+        txt += `>> EQUIPO: ${team.toUpperCase()}\n`;
+        txt += `----------------------------------------------------------------\n`;
+        txt += `${TEAM_FLAGS[team]} Selección ${team}\n\n`;
+        TEAMS[team].forEach(p => {
+          txt += `${p.nombre} (#${p.dorsal} - ${p.posicion})\n`;
+          txt += `  Valoración: ${p.puntos}/100\n`;
+          txt += `  Goles: ${p.goles || 0} | Asistencias: ${p.asistencias} | Pases: ${p.pases}\n`;
+          if (p.paradas) txt += `  Paradas: ${p.paradas}\n`;
+          txt += `\n`;
+        });
+      });
+      downloadFile('Fichas_Individuales.txt', txt, 'text/plain');
+    }
+
+    // =========================================================================
+    // EVENT LISTENERS (Funcionalidad Original)
+    // =========================================================================
+    document.querySelectorAll('.team-tab').forEach(tab => {
+      tab.addEventListener('click', () => selectTeam(tab.dataset.team));
     });
-  });
 
-  return rows.join("\n");
-}
+    document.getElementById('search-input').addEventListener('input', (e) => {
+      state.search = e.target.value;
+      renderPlayers();
+    });
 
-// --- Dispara la descarga de un Blob de texto con el nombre indicado ---
-function downloadFile(filename, content, mime) {
-  const blob = new Blob([content], { type: mime });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = filename;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
-  showToast(`${filename} descargado correctamente`);
-}
+    document.querySelectorAll('.pos-filter').forEach(btn => {
+      btn.addEventListener('click', () => {
+        state.position = btn.dataset.pos;
+        document.querySelectorAll('.pos-filter').forEach(b => {
+          b.classList.remove('bg-emerald-500', 'text-white');
+          b.classList.add('bg-slate-700', 'text-slate-300');
+        });
+        btn.classList.add('bg-emerald-500', 'text-white');
+        btn.classList.remove('bg-slate-700', 'text-slate-300');
+        renderPlayers();
+      });
+    });
 
-function handleExport(format) {
-  if (format === "txt") downloadFile("Fichas_Individuales.txt", generateASCII(), "text/plain;charset=utf-8");
-  if (format === "md") downloadFile("Tabla_Resumen.md", generateMarkdown(), "text/markdown;charset=utf-8");
-  if (format === "csv") downloadFile("Base_Datos.csv", generateCSV(), "text/csv;charset=utf-8");
-  document.getElementById("export-menu").classList.add("hidden");
-}
+    // Exportación
+    const exportBtn = document.getElementById('export-btn');
+    const exportMenu = document.getElementById('export-menu');
+    exportBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      exportMenu.classList.toggle('hidden');
+    });
 
-/* =========================================================================
-   RENDER MAESTRO Y EVENT LISTENERS GLOBALES
-   ========================================================================= */
-function renderAll() {
-  renderTeamTabs();
-  renderStandings();
-  renderTeamSummary();
-  renderPositionTabs();
-  renderRoster();
-}
+    document.querySelectorAll('.export-option').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const format = btn.dataset.format;
+        if (format === 'csv') exportCSV();
+        if (format === 'md') exportMD();
+        if (format === 'txt') exportTXT();
+        exportMenu.classList.add('hidden');
+      });
+    });
 
-document.getElementById("search-input").addEventListener("input", (e) => {
-  state.searchTerm = e.target.value;
-  renderRoster();
-});
+    // =========================================================================
+    // SISTEMA DE PERSONALIZACIÓN (NUEVO)
+    // =========================================================================
+    
+    let configState = {
+      mode: localStorage.getItem('elite-mode') || 'dark',
+      theme: localStorage.getItem('elite-theme') || 'default'
+    };
 
-document.getElementById("export-btn").addEventListener("click", () => {
-  document.getElementById("export-menu").classList.toggle("hidden");
-});
+    function applyConfig() {
+      if (configState.mode === 'light') {
+        document.body.setAttribute('data-mode', 'light');
+      } else {
+        document.body.removeAttribute('data-mode');
+      }
+      if (configState.theme !== 'default') {
+        document.body.setAttribute('data-theme', configState.theme);
+      } else {
+        document.body.removeAttribute('data-theme');
+      }
+      updateConfigIndicators();
+    }
 
-document.querySelectorAll(".export-option").forEach(btn => {
-  btn.addEventListener("click", () => handleExport(btn.dataset.format));
-});
+    function updateConfigIndicators() {
+      const lightInd = document.getElementById('indicator-light');
+      const darkInd = document.getElementById('indicator-dark');
 
-document.getElementById("player-modal").addEventListener("click", (e) => {
-  if (e.target.id === "player-modal") closePlayerModal();
-});
+      if (configState.mode === 'light') {
+        lightInd.style.borderColor = 'var(--accent)';
+        lightInd.style.boxShadow = '0 0 0 3px var(--accent)';
+        lightInd.innerHTML = '<div class="w-1.5 h-1.5 rounded-full mx-auto mt-0.5" style="background-color: var(--accent);"></div>';
+        darkInd.style.borderColor = 'var(--border)';
+        darkInd.style.boxShadow = 'none';
+        darkInd.innerHTML = '';
+      } else {
+        darkInd.style.borderColor = 'var(--accent)';
+        darkInd.style.boxShadow = '0 0 0 3px var(--accent)';
+        darkInd.innerHTML = '<div class="w-1.5 h-1.5 rounded-full mx-auto mt-0.5" style="background-color: var(--accent);"></div>';
+        lightInd.style.borderColor = 'var(--border)';
+        lightInd.style.boxShadow = 'none';
+        lightInd.innerHTML = '';
+      }
 
-document.addEventListener("keydown", (e) => {
-  if (e.key === "Escape") closePlayerModal();
-});
+      document.querySelectorAll('.theme-btn').forEach(btn => {
+        if (btn.dataset.color === configState.theme) {
+          btn.style.borderColor = 'var(--text-main)';
+          btn.style.transform = 'scale(1.15)';
+        } else {
+          btn.style.borderColor = 'transparent';
+          btn.style.transform = 'scale(1)';
+        }
+      });
+    }
 
-document.addEventListener("click", (e) => {
-  const menu = document.getElementById("export-menu");
-  const btn = document.getElementById("export-btn");
-  if (!menu.contains(e.target) && !btn.contains(e.target)) menu.classList.add("hidden");
-});
+    // Toggle menú configuración
+    document.getElementById('config-btn').addEventListener('click', (e) => {
+      e.stopPropagation();
+      document.getElementById('config-menu').classList.toggle('hidden');
+    });
 
-// Inicializa el dashboard
-renderAll();
-</script>
+    // Modo Claro
+    document.getElementById('btn-light').addEventListener('click', () => {
+      configState.mode = 'light';
+      document.body.setAttribute('data-mode', 'light');
+      localStorage.setItem('elite-mode', 'light');
+      updateConfigIndicators();
+    });
+
+    // Modo Oscuro
+    document.getElementById('btn-dark').addEventListener('click', () => {
+      configState.mode = 'dark';
+      document.body.removeAttribute('data-mode');
+      localStorage.setItem('elite-mode', 'dark');
+      updateConfigIndicators();
+    });
+
+    // Tema Predeterminado
+    document.getElementById('btn-default').addEventListener('click', () => {
+      configState.theme = 'default';
+      document.body.removeAttribute('data-theme');
+      localStorage.setItem('elite-theme', 'default');
+      updateConfigIndicators();
+    });
+
+    // Temas de Color
+    document.querySelectorAll('.theme-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        configState.theme = btn.dataset.color;
+        document.body.setAttribute('data-theme', btn.dataset.color);
+        localStorage.setItem('elite-theme', btn.dataset.color);
+        updateConfigIndicators();
+      });
+    });
+
+    // Cerrar menús al hacer clic fuera
+    document.addEventListener('click', (e) => {
+      const configMenu = document.getElementById('config-menu');
+      const configBtn = document.getElementById('config-btn');
+      const exportMenu = document.getElementById('export-menu');
+      const exportBtn = document.getElementById('export-btn');
+      
+      if (configMenu && !configMenu.contains(e.target) && !configBtn.contains(e.target)) {
+        configMenu.classList.add('hidden');
+      }
+      if (exportMenu && !exportMenu.contains(e.target) && !exportBtn.contains(e.target)) {
+        exportMenu.classList.add('hidden');
+      }
+    });
+
+    // Cerrar modal al hacer clic fuera
+    document.getElementById('player-modal').addEventListener('click', (e) => {
+      if (e.target.id === 'player-modal') closeModal();
+    });
+
+    // =========================================================================
+    // INICIALIZACIÓN
+    // =========================================================================
+    applyConfig();
+    renderAll();
+  </script>
 </body>
 </html>
